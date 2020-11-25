@@ -499,21 +499,11 @@ class Uploader {
         this._onMultipartComplete(error, response, body, bytesUploaded)
       })
     } else {
-      fs.stat(this.path, (err, stats) => {
-        if (err) {
-          logger.error(err, 'upload.multipart.size.error')
-          this.emitError(err)
-          return
-        }
-
-        const fileSizeInBytes = stats.size
-        reqOptions.headers['content-length'] = fileSizeInBytes
-        reqOptions.body = file
-        logger.info(JSON.stringify(reqOptions), 'upload.multipart.request.noFormData');
-        httpRequest(reqOptions, (error, response, body) => {
-          this._onMultipartComplete(error, response, body, bytesUploaded)
-        })
-      })
+      const stats = fs.statSync(this.path)
+      const fileSizeInBytes = stats.size
+      reqOptions.headers['content-length'] = fileSizeInBytes
+      reqOptions.body = file
+      request[httpMethod](reqOptions, (error, response, body) => this._onMultipartComplete(error, response, body, bytesUploaded))
     }
   }
 
@@ -537,6 +527,9 @@ class Uploader {
 
     logger.debug(JSON.stringify(respObj), 'upload.multipart.response.debug')
     logger.info(JSON.stringify(respObj), 'upload.multipart.response.info')
+
+    logger.info(`${bytesUploaded}`, 'upload.multipart.response.bytesUploaded')
+    logger.info(`${this.bytesWritten}`, 'upload.multipart.response.bytesWritten')
     if (response.statusCode >= 400) {
       logger.error(`upload failed with status: ${response.statusCode}`, 'upload.multipart.error')
       this.emitError(new Error(response.statusMessage), respObj)
