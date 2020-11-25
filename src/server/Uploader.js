@@ -499,13 +499,26 @@ class Uploader {
         this._onMultipartComplete(error, response, body, bytesUploaded)
       })
     } else {
-      const stats = fs.statSync(this.path)
+
+        const stats = fs.statSync(this.path)
+        const fileSizeInBytes = stats.size
+        reqOptions.headers['content-length'] = fileSizeInBytes
+        reqOptions.body = file
+        logger.info(JSON.stringify(reqOptions), 'upload.multipart.request.noFormData');
+        httpRequest(reqOptions, (error, response, body) => {
+          this._onMultipartComplete(error, response, body, bytesUploaded)
+        })
+    }
+  }
+
+    /*
+  
+        const stats = fs.statSync(this.path)
       const fileSizeInBytes = stats.size
       reqOptions.headers['content-length'] = fileSizeInBytes
       reqOptions.body = file
       request[httpMethod](reqOptions, (error, response, body) => this._onMultipartComplete(error, response, body, bytesUploaded))
-    }
-  }
+  */
 
   _onMultipartComplete (error, response, body, bytesUploaded) {
     if (error) {
