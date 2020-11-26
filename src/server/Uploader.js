@@ -499,15 +499,20 @@ class Uploader {
         this._onMultipartComplete(error, response, body, bytesUploaded)
       })
     } else {
-
+      try {
         const stats = fs.statSync(this.path)
         const fileSizeInBytes = stats.size
         reqOptions.headers['content-length'] = fileSizeInBytes
-        reqOptions.body = file
-        logger.info(JSON.stringify(reqOptions), 'upload.multipart.request.noFormData');
-        httpRequest(reqOptions, (error, response, body) => {
-          this._onMultipartComplete(error, response, body, bytesUploaded)
-        })
+        console.log('fileSizeInBytes', fileSizeInBytes)
+      } catch (err) {
+        logger.error(err, 'upload.multipart.size.error')
+        this.emitError(err)
+        return
+      }
+      reqOptions.body = file
+      httpRequest(reqOptions, (error, response, body) => {
+        this._onMultipartComplete(error, response, body, bytesUploaded)
+      })
     }
   }
 
