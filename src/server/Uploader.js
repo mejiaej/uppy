@@ -486,6 +486,7 @@ class Uploader {
         }
       )
 
+      logger.debug(JSON.stringify(reqOptions), 'upload.multipart.request')
       httpRequest(reqOptions, (error, response, body) => {
         this._onMultipartComplete(error, response, body, bytesUploaded)
       })
@@ -500,6 +501,7 @@ class Uploader {
         return
       }
       reqOptions.body = file
+      logger.debug(JSON.stringify(reqOptions), 'upload.multipart.request')
       httpRequest(reqOptions, (error, response, body) => {
         this._onMultipartComplete(error, response, body, bytesUploaded)
       })
