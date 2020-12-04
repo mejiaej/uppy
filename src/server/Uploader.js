@@ -467,6 +467,10 @@ class Uploader {
       this.emitIllusiveProgress(bytesUploaded)
     })
 
+    file.on('close', () => {
+      logger.debug(`file: ${this.uploadFileName}`, 'upload.multipart.file.close')
+    })
+
     const httpMethod = (this.options.httpMethod || '').toLowerCase() === 'put' ? 'put' : 'post'
     const headers = headerSanitize(this.options.headers)
     const reqOptions = { url: this.options.endpoint, headers, encoding: null }
