@@ -490,28 +490,26 @@ class Uploader {
         }
       )
 
-      logger.debug(JSON.stringify(reqOptions), 'upload.multipart.request')
+      logger.debug(JSON.stringify(reqOptions), 'upload.multipart.request.formData')
       httpRequest(reqOptions, (error, response, body) => {
         this._onMultipartComplete(error, response, body, bytesUploaded)
       })
     } else {
-      try {
-        const stats = fs.statSync(this.path)
-        const fileSizeInBytes = stats.size
-        reqOptions.headers['content-length'] = fileSizeInBytes
-      } catch (err) {
-        logger.error(err, 'upload.multipart.size.error')
-        this.emitError(err)
-        return
-      }
-      reqOptions.body = file
-      logger.debug(JSON.stringify(reqOptions), 'upload.multipart.request')
+
+      const fileSizeInBytes = this.bytesWritten
+      reqOptions.headers['content-length'] = fileSizeInBytes
+      reqOptions.body = file        
+      logger.debug(`about to upload ${this.bytesWritten} bytes`, 'upload.multipart.bytesUploaded')
+      logger.debug(JSON.stringify(reqOptions), 'upload.multipart.request.noFormData')
       httpRequest(reqOptions, (error, response, body) => {
         this._onMultipartComplete(error, response, body, bytesUploaded)
       })
     }
   }
 
+  timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
   _onMultipartComplete (error, response, body, bytesUploaded) {
     if (error) {
       logger.error(error, 'upload.multipart.error')
