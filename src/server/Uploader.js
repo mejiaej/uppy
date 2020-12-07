@@ -495,14 +495,22 @@ class Uploader {
         this._onMultipartComplete(error, response, body, bytesUploaded)
       })
     } else {
+      fs.stat(this.path, (err, stats) => {
+        if (err) {
+          logger.error(err, 'upload.multipart.size.error')
+          this.emitError(err)
+          return
+        }
 
-      const fileSizeInBytes = this.bytesWritten
-      reqOptions.headers['content-length'] = fileSizeInBytes
-      reqOptions.body = file        
-      logger.debug(`about to upload ${this.bytesWritten} bytes`, 'upload.multipart.bytesUploaded')
-      logger.debug(JSON.stringify(reqOptions), 'upload.multipart.request.noFormData')
-      httpRequest(reqOptions, (error, response, body) => {
-        this._onMultipartComplete(error, response, body, bytesUploaded)
+        const fileSizeInBytes = stats.size
+        reqOptions.headers['content-length'] = fileSizeInBytes
+        reqOptions.body = file
+        setTimeout(() => {
+          logger.debug(JSON.stringify(reqOptions), 'upload.multipart.request.noFormData')
+          httpRequest(reqOptions, (error, response, body) => {
+            this._onMultipartComplete(error, response, body, bytesUploaded)
+          })
+        }, 1500)
       })
     }
   }
