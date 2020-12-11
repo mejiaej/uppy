@@ -9,8 +9,6 @@ node_modules
 
 env.sh
 
-dist/
-lib/
 coverage/
 examples/dev/bundle.js
 examples/aws-presigned-url/vendor/*
@@ -36,6 +34,7 @@ website/themes/uppy/layout/partials/generated_stargazers.ejs
 examples/dev/file.txt
 issues.txt
 
+!node_modules/
 # companion deployment files
 transloadit-cluster-kubeconfig.yaml
 companion-env.yml
