@@ -331,7 +331,8 @@ module.exports = class MiniXHRUpload {
           const uploadResp = {
             status: data.response.status,
             body,
-            uploadURL
+            uploadURL,
+            bytesUploaded: data.bytesUploaded
           }
 
           this.uppy.emit('upload-success', file, uploadResp)
